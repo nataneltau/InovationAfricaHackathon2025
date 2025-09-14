@@ -1,8 +1,8 @@
 import os
-import mysql.connector
+import pymysql
 from azure.keyvault.secrets import SecretClient
 from azure.identity import InteractiveBrowserCredential, ClientSecretCredential
-from mysql.connector import Error
+from pymysql import Error
 import logging
 
 # Configure logging
@@ -82,17 +82,24 @@ class DatabaseManager:
         try:
             # Get password from Key Vault
             password = self.get_password_from_keyvault()
-            
+            print(password)
             # Create database connection
-            self.connection = mysql.connector.connect(
+            self.connection = pymysql.connect(
                 host="104.248.128.21",
                 port=3306,
                 database="innovationAfrica", 
                 user="hackathon",
                 password=password,
-                auth_plugin='mysql_native_password',  # ← ADD THIS
-                use_pure=True,                        # ← ADD THIS
+                ssl={"ssl": {}},   # if you’re connecting with SSL from Azure/MySQL Cloud
             )
+            print("hi")
+            cursor = self.connection.cursor()
+            cursor.execute("SELECT * FROM locations limit 10")
+
+            for row in cursor.fetchall():
+                print(row)
+
+            self.connection.close()
             
             if self.connection.is_connected():
                 db_info = self.connection.get_server_info()
