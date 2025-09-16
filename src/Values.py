@@ -146,6 +146,31 @@ CERTIFICATION_MATRIX = {
     ]
 }
 
+def _build_certification_matrix_by_task() -> Dict[str, List[str]]:
+    """
+    Build reverse certification matrix from CERTIFICATION_MATRIX.
+    Private function used internally to generate CERTIFICATION_MATRIX_BY_TASK.
+    
+    Returns:
+        Dictionary mapping task types to lists of positions that can perform them
+    """
+    matrix_by_task: Dict[str, List[str]] = {}
+    for position, task_types in CERTIFICATION_MATRIX.items():
+        for task_type in task_types:
+            if task_type not in matrix_by_task:
+                matrix_by_task[task_type] = []
+            matrix_by_task[task_type].append(position)
+    
+    # Sort the lists for consistent output
+    for task_type in matrix_by_task:
+        matrix_by_task[task_type].sort()
+    
+    return matrix_by_task
+
+# Reverse certification matrix: which task types can be performed by which positions
+# This is automatically built from CERTIFICATION_MATRIX for consistency
+CERTIFICATION_MATRIX_BY_TASK = _build_certification_matrix_by_task()
+
 
 # ===========================
 # SERVICE LEVEL AGREEMENTS (SLA)
@@ -345,11 +370,8 @@ def get_certified_positions_for_task(task_type: str) -> List[str]:
     Returns:
         List of job positions that can perform this task
     """
-    certified_positions = []
-    for position, certifications in CERTIFICATION_MATRIX.items():
-        if task_type in certifications:
-            certified_positions.append(position)
-    return certified_positions
+    # Use the reverse matrix for O(1) lookup instead of O(n) iteration
+    return CERTIFICATION_MATRIX_BY_TASK.get(task_type, []).copy()
 
 
 def get_available_employees_for_task(task_type: str, country: Optional[str] = None) -> List[Employee]:
@@ -438,3 +460,12 @@ if __name__ == "__main__":
     # Example: Show employee summary
     print(f"\nTotal employees by country: {EMPLOYEE_SUMMARY['total_by_country']}")
     print(f"Grand total employees: {EMPLOYEE_SUMMARY['grand_total']}")
+    
+    # Example: Show the reverse certification matrix
+    print("\n" + "=" * 50)
+    print("Reverse Certification Matrix (Task → Positions)")
+    print("=" * 50)
+    for task_type, positions in CERTIFICATION_MATRIX_BY_TASK.items():
+        print(f"\n{task_type}:")
+        for position in positions:
+            print(f"  - {position}")

@@ -19,11 +19,21 @@ The `Values.py` file contains all static data structures extracted from the Exce
 - Maximum tasks per day (3)
 
 ### 3. **Certification Matrix**
-Maps which job positions can perform which task types:
+Two matrices for certification lookups:
+
+**Forward Matrix (CERTIFICATION_MATRIX)**
+Maps job positions to their allowed task types:
 - Field Civil Engineers → Corrective tasks only
 - Field Officers → Corrective and Preventative Maintenance
 - Field Water Quality Specialists → Corrective and Water Quality Samples
 - And more...
+
+**Reverse Matrix (CERTIFICATION_MATRIX_BY_TASK)**
+Maps task types to all positions that can perform them:
+- Corrective → 9 positions (all except Supervisor of Hydro/WQ)
+- Preventative Maintenance → 7 positions
+- Monitoring & Evaluation → 6 positions  
+- Water Quality Samples → 2 positions (specialists only)
 
 ### 4. **SLA Matrix**
 Service Level Agreement days organized by:
